@@ -50,33 +50,100 @@ const VideoCarousel = () => {
   const handleLoadedMetaData = (i, e) =>
     setLoadedData((prev) => ({ ...prev, e }))
 
+  // useEffect(() => {
+  //   let currentProgressBar = 0
+  //   let span = videoSpanRef.current
+  //   if (span[videoId]) {
+  //     //   animate the progress bar of the video
+  //     let anime = gsap.to(span[videoId], {
+  //       onUpdate: () => {
+  //         const progressBar = Math.ceil(anime.progress() * 100)
+
+  //         if (progressBar != currentProgressBar) {
+  //           currentProgressBar = progressBar
+  //         }
+
+  //         gsap.to(videoDivRef.current[videoId], {
+  //           width:
+  //             window.innerWidth < 760
+  //               ? "10vw"
+  //               : window.innerWidth < 1200
+  //               ? "10vw"
+  //               : "4vw",
+  //         })
+
+  //         gsap.to(span[videoId], {
+  //           width: `${currentProgressBar}%`,
+  //           backgroundColor: "white",
+  //           duration: 0.5,
+  //         })
+  //       },
+  //       onComplete: () => {
+  //         if (isPlaying) {
+  //           gsap.to(videoDivRef.current[videoId], {
+  //             width: "12px",
+  //           })
+  //           gsap.to(span[videoId], { backgroundColor: "#afafaf" })
+  //         }
+  //       },
+  //     })
+
+  //     if (videoId == 0) {
+  //       anime.restart()
+  //     }
+
+  //     // update the progress bar
+  //     const animUpdate = () => {
+  //       anime.progress(
+  //         videoRef.current[videoId].currentTime /
+  //           hightlightsSlides[videoId].videoDuration
+  //       )
+  //     }
+
+  //     if (isPlaying) {
+  //       // ticker to update the progress bar
+  //       gsap.ticker.add(animUpdate)
+  //     } else {
+  //       // remove the ticker when the video is paused (progress bar is stopped)
+  //       gsap.ticker.remove(animUpdate)
+  //     }
+  //   }
+  // }, [videoId, startPlay, isPlaying])
   useEffect(() => {
     let currentProgressBar = 0
     let span = videoSpanRef.current
-    if (span[videoId]) {
+
+    if (span[videoId] && videoRef.current[videoId]) {
       //   animate the progress bar of the video
       let anime = gsap.to(span[videoId], {
         onUpdate: () => {
           const progressBar = Math.ceil(anime.progress() * 100)
 
-          if (progressBar != currentProgressBar) {
+          if (progressBar !== currentProgressBar) {
             currentProgressBar = progressBar
           }
 
-          gsap.to(videoDivRef.current[videoId], {
-            width:
-              window.innerWidth < 760
-                ? "10vw"
-                : window.innerWidth < 1200
-                ? "10vw"
-                : "4vw",
-          })
+          const currentVideo = videoRef.current[videoId]
+          if (currentVideo) {
+            const videoDuration = hightlightsSlides[videoId].videoDuration
+            const currentTime = currentVideo.currentTime
+            const progress = currentTime / videoDuration
 
-          gsap.to(span[videoId], {
-            width: `${currentProgressBar}%`,
-            backgroundColor: "white",
-            duration: 0.5,
-          })
+            gsap.to(videoDivRef.current[videoId], {
+              width:
+                window.innerWidth < 760
+                  ? "10vw"
+                  : window.innerWidth < 1200
+                  ? "10vw"
+                  : "4vw",
+            })
+
+            gsap.to(span[videoId], {
+              width: `${currentProgressBar}%`,
+              backgroundColor: "white",
+              duration: 0.5,
+            })
+          }
         },
         onComplete: () => {
           if (isPlaying) {
@@ -88,16 +155,18 @@ const VideoCarousel = () => {
         },
       })
 
-      if (videoId == 0) {
+      if (videoId === 0) {
         anime.restart()
       }
 
       // update the progress bar
       const animUpdate = () => {
-        anime.progress(
-          videoRef.current[videoId].currentTime /
-            hightlightsSlides[videoId].videoDuration
-        )
+        const currentVideo = videoRef.current[videoId]
+        if (currentVideo) {
+          anime.progress(
+            currentVideo.currentTime / hightlightsSlides[videoId].videoDuration
+          )
+        }
       }
 
       if (isPlaying) {
@@ -107,8 +176,11 @@ const VideoCarousel = () => {
         // remove the ticker when the video is paused (progress bar is stopped)
         gsap.ticker.remove(animUpdate)
       }
+    } else {
+      console.log("Video element or span element is not available:", videoId)
     }
   }, [videoId, startPlay, isPlaying])
+
 
   useEffect(() => {
     if (loadedData.length > 3) {
