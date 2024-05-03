@@ -46,11 +46,7 @@ const IphoneModalView = ({
             </html>
           }
         >
-          <IPhone
-            scale={index === 1 ? [15, 15, 15] : [17, 17, 17]}
-            size={size}
-            item={item}
-          />
+          {/* <IPhone scale={index === 1 ? [15, 15, 15] : [17, 17, 17]} /> */}
         </Suspense>
       </group>
     </View>
